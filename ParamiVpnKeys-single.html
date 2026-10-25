@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parami VPN Keys — ကိုယ်ပိုင် Key Site</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:sans-serif;background:#FFF6E5;color:#2B2350}
+.wrap{max-width:620px;margin:0 auto;padding:14px 14px 60px}
+h1{font-size:24px;margin:8px 0 4px} h2{font-size:18px;margin:22px 0 8px} h3{font-size:16px;margin:14px 0 6px}
+.card{background:#fff;border:3px solid #2B2350;border-radius:18px;box-shadow:0 4px 0 #2B2350;padding:14px;margin-top:12px}
+.warn{background:#FFE3E3;border-color:#C0392B} .ok{background:#D8F5E3}
+label{display:block;font-weight:700;font-size:14px;margin:10px 0 4px}
+input,select,textarea{width:100%;font-size:15px;padding:10px 12px;border:3px solid #2B2350;border-radius:12px;background:#fff;color:#2B2350}
+textarea{min-height:90px;line-height:1.5;word-break:break-all}
+.btn{font-size:15px;font-weight:700;padding:10px 16px;border-radius:999px;border:3px solid #2B2350;background:#fff;color:#2B2350;box-shadow:0 3px 0 #2B2350;cursor:pointer;margin:6px 6px 0 0}
+.btn.primary{background:#FFB800} .btn.teal{background:#2EC4B6} .btn.small{font-size:13px;padding:7px 12px} .btn.danger{color:#C0392B} .btn.active{background:#2EC4B6}
+.muted{color:#6B6390;font-size:13px;line-height:1.6} .chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#EDE9FF;border:2px solid #2B2350;text-transform:uppercase}
+.keyrow{border-top:2px dashed #EDE9FF;padding:10px 0} code{word-break:break-all;font-size:12px}
+.mode{display:none} .mode:first-of-type{display:block}
+ol,ul{line-height:1.7;font-size:15px}
+</style>
+</head>
+<body><div class="wrap">
+<h1>🔑 Parami VPN Keys</h1>
+<p class="muted">တခြား site ကမဟုတ်ဘဲ ကိုယ်ပိုင် site နဲ့ V2Ray / SSH / Shadowsocks / Outline key ထုတ်မယ်။</p>
+
+<div class="card warn"><b>အရေးကြီးဆုံး အချက်</b><br>
+Site က key ထုတ်ပေးရုံပဲ။ တကယ် ချိတ်ဖို့က <b>server တစ်လုံး</b> လိုတယ်။ Server မှာ အဲဒီ UUID/password နဲ့ ကိုက်တဲ့ config run ထားမှ key က အလုပ်လုပ်မယ်။ Server မရှိတဲ့ key က ချိတ်လို့မရဘူး။
+<br><br>ဒီ site က ဘာကိုမှ server ကို မပို့ဘူး။ Key တွေက ဒီ browser ထဲမှာပဲ သိမ်းပါတယ်။ QR ထုတ်ဖို့ အပြင် QR server ကို key ပို့တာမျိုး မလုပ်ထားဘူး။</div>
+
+<div class="card">
+<h2 style="margin-top:0">၁။ Key ထုတ်မယ်</h2>
+<label>Protocol</label>
+<select id="proto">
+<option value="vless">VLESS (V2Ray)</option>
+<option value="vmess">VMess (V2Ray)</option>
+<option value="trojan">Trojan</option>
+<option value="ss">Shadowsocks</option>
+<option value="outline">Outline (Shadowsocks)</option>
+<option value="ssh">SSH</option>
+</select>
+<label>အမည်</label><input id="name" placeholder="ဥပမာ Parami SG-1">
+<label id="serverLabel">Server (domain / IP)</label><input id="server" placeholder="ဥပမာ vpn.example.com / 1.2.3.4 / tunnel domain">
+<label>Port</label><input id="port" value="443">
+<div id="f-vless">
+<label>UUID</label><input id="uuid" placeholder="UUID"><button class="btn small" id="btnUuid" type="button">🎲 UUID ထုတ်မယ်</button>
+<label>Security</label><select id="security"><option value="tls">tls (အကြံပြု)</option><option value="none">none (private IP ပဲရ)</option><option value="reality">reality</option></select>
+<label>Network</label><select id="network"><option value="ws">ws (WebSocket)</option><option value="tcp">tcp</option><option value="grpc">grpc</option></select>
+<label>Host / SNI</label><input id="host" placeholder="domain (ဗလာထားရင် server နဲ့တူ)">
+<label>Path</label><input id="path" value="/">
+<label>SNI</label><input id="sni" placeholder="domain">
+</div>
+<div id="f-vmess" style="display:none">
+<label>Security (scy)</label><select id="scy"><option value="auto">auto</option><option value="aes-128-gcm">aes-128-gcm</option><option value="chacha20-poly1305">chacha20-poly1305</option></select>
+<p class="muted">VMess က အပေါ်က UUID, Security, Network, Host, Path, SNI ကိုပဲ သုံးပါတယ်။</p>
+</div>
+<div id="f-trojan" style="display:none"><p class="muted">Trojan က အပေါ်က Password, Security, Network, Host, Path, SNI ကိုပဲ သုံးပါတယ်။</p></div>
+<div id="f-ss" style="display:none">
+<label>Password</label><input id="password" placeholder="password"><button class="btn small" id="btnPass" type="button">🎲 Password ထုတ်မယ်</button>
+<label>Method</label><select id="method"><option value="aes-256-gcm">aes-256-gcm (အကြံပြု)</option><option value="aes-128-gcm">aes-128-gcm</option><option value="chacha20-ietf-poly1305">chacha20-ietf-poly1305</option><option value="2022-blake3-aes-128-gcm">2022-blake3-aes-128-gcm</option></select>
+</div>
+<div id="f-ssh" style="display:none">
+<label>Username</label><input id="sshUser" placeholder="ဥပမာ user1">
+<label>Password</label><p class="muted">အပေါ်က Password field (Shadowsocks အပိုင်းမှာ ပေါ်ပါတယ်) ကိုပဲ သုံးပါတယ်။</p>
+<label>Proxy Host (ရှိရင်)</label><input id="proxyHost" placeholder="proxy.example.com">
+<label>Proxy Port</label><input id="proxyPort" placeholder="8080">
+<p class="muted">SSH က link မဟုတ်ဘူး။ Flâsh VPN → ထည့်ရန် → SSH form မှာ အောက်က အတိုင်း ဖြည့်ပါ။</p>
+</div>
+<p class="muted">မှတ်ချက်: VMess/Trojan/SSH form တွေမှာ UUID/Password field တစ်ခုတည်းကို မျှသုံးထားပါတယ်။ VLESS မှာ UUID ထုတ်ပြီးရင် VMess ပြောင်းလည်း အတူတူ UUID ပဲ သုံးလို့ရတယ်။</p>
+<label>ထုတ်တဲ့ Key / Link</label><textarea id="output" readonly placeholder="Server ထည့်လိုက်ရင် ဒီမှာ link ပေါ်မယ်"></textarea>
+<p id="warn" class="muted"></p>
+<button class="btn primary" id="btnCopy" type="button">📋 Copy ကူးမယ်</button>
+<span id="copyMsg" class="muted"></span>
+<br><label>သက်တမ်း (ဥပမာ 2026-11-25)</label><input id="expiry" placeholder="YYYY-MM-DD">
+<button class="btn teal" id="btnSave" type="button">💾 ငါ့ Keys ထဲ သိမ်းမယ်</button>
+<span id="saveMsg" class="muted"></span>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">၂။ ငါ့ Keys + Subscription</h2>
+<div id="myKeys"></div>
+<label>Subscription (Flâsh VPN → Subscription URL အစား၊ ဒီ text ကို file အဖြစ် သိမ်းပြီး import လုပ်လို့ရ)</label>
+<textarea id="subOut" readonly></textarea>
+<button class="btn" id="btnSubCopy" type="button">📋 Subscription Copy</button>
+<p class="muted">Flâsh VPN ထဲမှာ: ထည့်ရန် → Link ကူးထည့်မှာ link တစ်ခုချင်း ကပ်တာက အသေချာဆုံးပါ။ Subscription text ကို base64 ဖြေပြီး link တွေ ပြန်ထုတ်ဖို့ site ပေါ်က Copy လုပ်ပြီးမှ သုံးပါ။</p>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">၃။ VPS မရှိရင် ဘာသုံးမလဲ? (အစားထိုး ၄ မျိုး)</h2>
+<p><b>ရိုးရိုးအမှန်:</b> တခြားသူတွေအတွက် 24/7 ပေးချင်ရင် တစ်ခုခုတော့ အမြဲဖွင့်ထားရမယ်။ ဖွင့်ထားမယ့်အရာ မရှိဘဲ 24/7 မရဘူး။ VPS မရှိရင် အောက်က တစ်ခုခုက အဲဒီနေရာကို ယူတယ်။</p>
+<button class="btn active" data-mode="router" type="button">🏠 အိမ်က Router</button>
+<button class="btn" data-mode="phone" type="button">📱 ဖုန်း on-demand</button>
+<button class="btn" data-mode="tunnel" type="button">☁️ Tunnel + အိမ်စက်</button>
+<button class="btn" data-mode="freecloud" type="button">🆓 Free Cloud</button>
+
+<div class="mode" id="mode-router">
+<h3>အကောင်းဆုံး အစားထိုး: အိမ်က Router (ဖုန်းဖွင့်ထားစရာ မလို)</h3>
+<p>Router က မူလကတည်းက 24/7 ဖွင့်ထားပြီးသားပါ။ ဒါက မင်းရဲ့ စံနှုန်း — ဖုန်းဖွင့်ထားစရာ မလို၊ ကိုယ်ပိုင်စက်ပဲ — နဲ့ အကိုက်ဆုံးပါ။</p>
+<ol>
+<li>Router admin page ဖွင့်ကြည့်: VPN Server / WireGuard / OpenVPN ဆိုတာ ပါလား စစ်ပါ။ Asus, TP-Link, MikroTik တချို့မှာ ပါပြီးသား။</li>
+<li>WireGuard server ပါရင် အဲဒါက အလွယ်ဆုံးပါ။ Flâsh VPN က WireGuard .conf ထည့်လို့ရတယ်။</li>
+<li>OpenWrt တင်လို့ရတဲ့ router ဆိုရင် Shadowsocks / Xray ကို router ပေါ်မှာတင် run လို့ရတယ်။</li>
+<li>ISP က ပေးတဲ့ router မှာ VPN server မပါရင်၊ အဲဒီ router ကို ပြောင်းလို့မရရင် အောက်က Tunnel နည်းကို သုံးပါ။</li>
+</ol>
+<p class="muted">အိမ်က internet က CGNAT ဖြစ်နေရင် router ကို အပြင်က တိုက်ရိုက် ချိတ်လို့မရဘူး။ အဲဒီအခါ Tunnel နည်း လိုတယ်။</p>
+</div>
+
+<div class="mode" id="mode-phone">
+<h3>ကိုယ်တိုင်စမ်းဖို့: ဖုန်း on-demand (24/7 host အတွက် မဟုတ်)</h3>
+<p>Termux ထဲမှာ Shadowsocks / Xray run ပြီး ကိုယ်တိုင် ချိတ်စမ်းလို့ရတယ်။ ဒါက မင်းအရင်ပြောခဲ့တဲ့အတိုင်းပဲ: ဖုန်းဖွင့်ထားရမယ်ဆိုရင် Termux နဲ့ပဲ လုပ်လိုက်တာက ပိုရိုးတယ်။</p>
+<ol>
+<li>Termux ဖွင့် → <code>scripts/termux-quick.sh</code> ကို ကြည့်။</li>
+<li>ဖုန်းနဲ့ တူတဲ့ WiFi ထဲက စက်တွေပဲ ချိတ်လို့ရမယ် (ဒါမှမဟုတ် Tunnel နဲ့ အပြင်ထုတ်ရမယ်)။</li>
+<li>ဖုန်းပိတ်ရင် / အိပ်သွားရင် server ရပ်သွားမယ်။ တခြားသူတွေအတွက် 24/7 မပေးနိုင်ဘူး။ ဒါကို host လုပ်တယ်လို့ မပြောပါနဲ့။</li>
+</ol>
+</div>
+
+<div class="mode" id="mode-tunnel">
+<h3>CGNAT ကို ကျော်ဖို့: Cloudflare Tunnel + အိမ်စက်</h3>
+<p>ထိုင်းဖုန်း carrier CGNAT လို၊ အိမ် internet ကလည်း public IP မပေးရင် အပြင်က တိုက်ရိုက် ဝင်လို့မရဘူး။ Cloudflare Tunnel က အိမ်စက်ကနေ အပြင်ကို ချိတ်ထွက်ပြီး domain တစ်ခုနဲ့ ပြန်ဝင်လို့ရအောင် လုပ်ပေးတယ်။</p>
+<ol>
+<li>အမြဲဖွင့်ထားမယ့် စက် လိုတယ်: router, mini PC, Raspberry Pi, ဒါမှမဟုတ် အဟောင်းဖုန်း။ Main ဖုန်း မဟုတ်တာက ပိုကောင်းတယ်။</li>
+<li>အဲဒီစက်မှာ <code>cloudflared tunnel</code> run ပြီး ကိုယ့် domain နဲ့ ချိတ်ပါ။</li>
+<li>Tunnel က website / panel အတွက် အကောင်းဆုံးပါ။ VPN traffic အတွက်တော့ TCP/WebSocket ပုံစံ (VLESS WS) နဲ့မှ အဆင်ပြေနိုင်တယ်။ UDP WireGuard ကို Tunnel နဲ့ တိုက်ရိုက် မသယ်နိုင်ဘူး။</li>
+<li>အဲဒီစက် ပိတ်ရင် အားလုံး ရပ်တယ်။</li>
+</ol>
+<p class="muted">သတိ: Cloudflare Workers ကို VPN endpoint အဖြစ် ပြန်မသုံးပါနဲ့။ အရင် Edge VLESS-WS တွေ 1101 နဲ့ သေဖူးတယ်။ Tunnel က Workers မဟုတ်ဘူး၊ ဒါပေမဲ့ VPN အတွက် Cloudflare ရဲ့ စည်းမျဉ်းကို ချိုးဖောက်မိမလား ဆိုတာ ကိုယ့် domain / account နဲ့ စစ်ပြီးမှ လူအများအတွက် ဖွင့်ပါ။</p>
+</div>
+
+<div class="mode" id="mode-freecloud">
+<h3>နောက်ဆုံး အရန်နည်း: Free Cloud (VPS အမျိုးအစားပဲ၊ ဒါပေမဲ့ ဝယ်စရာမလို)</h3>
+<p>ဒါက တကယ်တော့ VPS ပဲ။ ဒါပေမဲ့ လောလောဆယ် VPS မရှိဘူးဆိုရင်၊ hardware မဝယ်ဘဲ 24/7 အတွက် အမြန်ဆုံး နည်းပါ။</p>
+<ul>
+<li>Oracle Always Free, Google / AWS free tier လိုမျိုးတွေမှာ အခမဲ့ VM ရနိုင်တယ်။ Card verification တောင်းတတ်တယ်၊ idle ဖြစ်ရင် ပြန်သိမ်းနိုင်တယ်။</li>
+<li>ဒါက မင်းအရင် ငြင်းခဲ့တဲ့ အချက်နဲ့ တိုက်ဆိုင်တယ်: စက်က သူများဟာ ဖြစ်သွားမယ်။ Site နဲ့ key က ကိုယ်ပိုင်ပေမဲ့ server စက်က ကိုယ်ပိုင်မဟုတ်ဘူး။</li>
+<li>ဒါကြောင့် ဒါကို အမြဲတမ်း ဖြေရှင်းချက်လို့ မမှတ်ပါနဲ့။ Router / ကိုယ်ပိုင်စက် ရတဲ့အခါ အဲဒီကို ပြောင်းပါ။</li>
+</ul>
+</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">၄။ Flâsh VPN နဲ့ ကိုက်ညီမှု</h2>
+<ul>
+<li><b>VLESS:</b> public server မှာ security=none ဆို Flâsh ရဲ့ Xray core က ငြင်းတယ်။ TLS သုံးပါ။</li>
+<li><b>Shadowsocks / Outline:</b> ss:// link ကို Flâsh ထဲ ကူးထည့်လို့ရတယ်။ Outline က ss + outline=1 ပုံစံပါ။</li>
+<li><b>SSH:</b> Flâsh ထဲမှာ SSH form မှာ Host/Port/User/Pass ဖြည့်ရတယ်။ Link ပုံစံ မဟုတ်ဘူး။</li>
+<li><b>Server config:</b> site က ထုတ်တဲ့ UUID/password နဲ့ server ပေါ်က config တူရမယ်။ တူမှ ချိတ်မယ်။</li>
+</ul>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">၅။ ဒီ site ကို ဘယ်လို တင်မလဲ</h2>
+<p class="muted">ဒါက static site ပဲ (HTML + JS)။ Backend မလို။ GitHub Pages, Cloudflare Pages, ဒါမှမဟုတ် အိမ်စက် / router ပေါ်က web server မှာတင် တင်လို့ရတယ်။ <code>DEPLOY.md</code> ကို ကြည့်ပါ။<br>
+ပြည်သူအားလုံး မြင်နိုင်တဲ့ site အဖြစ် တင်ရင်၊ တကယ့် server password တွေ မထည့်ပါနဲ့။ Key ထုတ်ဖို့ပဲ သုံးပြီး server config ကို သီးသန့် လုပ်ပါ။</p>
+</div>
+
+</div>
+<script>
+/* Parami VPN Keys - pure generator functions, no server, no external calls.
+   Keys saved only in this browser's localStorage. Nothing is sent anywhere. */
+(function () {
+  'use strict';
+  function newUUID() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+  function newPass(len) {
+    len = len || 16;
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
+    var out = '';
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      var a = new Uint8Array(len);
+      crypto.getRandomValues(a);
+      for (var i = 0; i < len; i++) out += chars[a[i] % chars.length];
+      return out;
+    }
+    for (var j = 0; j < len; j++) out += chars[Math.floor(Math.random() * chars.length)];
+    return out;
+  }
+  function b64(str) {
+    if (typeof Buffer !== 'undefined') return Buffer.from(str, 'utf8').toString('base64');
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function b64url(str) {
+    return b64(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function encName(name) { return encodeURIComponent(name || 'Parami'); }
+
+  function vlessLink(o) {
+    var q = 'security=' + encodeURIComponent(o.security || 'tls')
+      + '&type=' + encodeURIComponent(o.network || 'ws')
+      + '&host=' + encodeURIComponent(o.host || o.server)
+      + '&path=' + encodeURIComponent(o.path || '/')
+      + '&sni=' + encodeURIComponent(o.sni || o.server);
+    if (o.network === 'ws') q += '&encryption=none';
+    return 'vless://' + o.uuid + '@' + o.server + ':' + o.port + '?' + q + '#' + encName(o.name);
+  }
+  function vmessLink(o) {
+    var obj = {
+      v: '2', ps: o.name || 'Parami', add: o.server, port: String(o.port),
+      id: o.uuid, aid: '0', scy: o.scy || 'auto', net: o.network || 'ws',
+      type: 'none', host: o.host || o.server, path: o.path || '/',
+      tls: (o.security === 'tls' ? 'tls' : ''), sni: o.sni || o.server
+    };
+    return 'vmess://' + b64(JSON.stringify(obj));
+  }
+  function trojanLink(o) {
+    var q = 'security=tls&type=' + encodeURIComponent(o.network || 'tcp')
+      + '&sni=' + encodeURIComponent(o.sni || o.server);
+    if (o.network === 'ws') q += '&host=' + encodeURIComponent(o.host || o.server) + '&path=' + encodeURIComponent(o.path || '/');
+    return 'trojan://' + encodeURIComponent(o.password) + '@' + o.server + ':' + o.port + '?' + q + '#' + encName(o.name);
+  }
+  function ssLink(o, outline) {
+    var userinfo = b64(o.method + ':' + o.password);
+    var url = 'ss://' + userinfo + '@' + o.server + ':' + o.port;
+    if (outline) url += '/?outline=1';
+    return url + '#' + encName(o.name);
+  }
+  function sshText(o) {
+    return 'SSH Server\n'
+      + 'Host: ' + o.server + '\nPort: ' + o.port + '\nUsername: ' + o.user + '\nPassword: ' + o.password + '\n'
+      + (o.proxyHost ? 'Proxy Host: ' + o.proxyHost + '\nProxy Port: ' + (o.proxyPort || '') + '\n' : '')
+      + (o.sni ? 'SNI: ' + o.sni + '\n' : '')
+      + 'Note: Flâsh VPN ထဲမှာ SSH form မှာ ဒီအတိုင်း ဖြည့်ပါ။';
+  }
+  function buildLink(proto, o) {
+    if (proto === 'vless') return vlessLink(o);
+    if (proto === 'vmess') return vmessLink(o);
+    if (proto === 'trojan') return trojanLink(o);
+    if (proto === 'ss') return ssLink(o, false);
+    if (proto === 'outline') return ssLink(o, true);
+    if (proto === 'ssh') return sshText(o);
+    throw new Error('unknown protocol: ' + proto);
+  }
+  function buildSubscription(links) {
+    return b64(links.filter(Boolean).join('\n'));
+  }
+
+  var api = { newUUID: newUUID, newPass: newPass, b64: b64, buildLink: buildLink, buildSubscription: buildSubscription, vlessLink: vlessLink, vmessLink: vmessLink, trojanLink: trojanLink, ssLink: ssLink, sshText: sshText };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  if (typeof window !== 'undefined') window.ParamiKeys = api;
+
+  if (typeof document === 'undefined') return;
+  document.addEventListener('DOMContentLoaded', function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var protoEl = $('proto'), outEl = $('output'), warnEl = $('warn');
+    function showFields() {
+      var p = protoEl.value;
+      ['f-vless', 'f-vmess', 'f-trojan', 'f-ss', 'f-ssh'].forEach(function (id) {
+        $(id).style.display = 'none';
+      });
+      // UUID / security / network live in f-vless, password lives in f-ss.
+      // VMess and Trojan reuse those same inputs, SSH reuses the password input.
+      if (p === 'vless' || p === 'vmess' || p === 'trojan') $('f-vless').style.display = 'block';
+      if (p === 'vmess') $('f-vmess').style.display = 'block';
+      if (p === 'trojan') { $('f-trojan').style.display = 'block'; $('f-ss').style.display = 'block'; }
+      if (p === 'ss' || p === 'outline') $('f-ss').style.display = 'block';
+      if (p === 'ssh') { $('f-ssh').style.display = 'block'; $('f-ss').style.display = 'block'; }
+      $('serverLabel').textContent = (p === 'ssh') ? 'SSH Host' : 'Server (domain / IP)';
+    }
+    function collect() {
+      return {
+        name: $('name').value.trim() || 'Parami',
+        server: $('server').value.trim(),
+        port: $('port').value.trim() || '443',
+        uuid: $('uuid').value.trim(),
+        password: $('password').value.trim(),
+        method: $('method').value,
+        security: $('security').value,
+        network: $('network').value,
+        host: $('host').value.trim(),
+        path: $('path').value.trim() || '/',
+        sni: $('sni').value.trim(),
+        scy: $('scy').value,
+        user: $('sshUser').value.trim(),
+        proxyHost: $('proxyHost').value.trim(),
+        proxyPort: $('proxyPort').value.trim()
+      };
+    }
+    function render() {
+      var o = collect(), p = protoEl.value, warn = '';
+      if (!o.server) { outEl.value = ''; warnEl.textContent = 'Server ထည့်ဦး။ Server မရှိရင် key က ချိတ်လို့မရဘူး။'; return; }
+      if (p === 'vless' && o.security === 'none') warn = '⚠️ သတိ: VLESS security=none ကို public server မှာ Flâsh ရဲ့ Xray core က ငြင်းတယ်။ TLS သုံးပါ။';
+      if (p === 'ss' || p === 'outline') {
+        if (!o.password) { warnEl.textContent = 'SS password ထည့်ဦး။'; return; }
+      } else if (p !== 'ssh' && !o.uuid && p !== 'trojan') {
+        warnEl.textContent = 'UUID ထည့်ဦး၊ ဒါမှမဟုတ် UUID ထုတ်မယ် နှိပ်ပါ။'; return;
+      }
+      try { outEl.value = buildLink(p, o); } catch (e) { outEl.value = ''; warn = 'Error: ' + e.message; }
+      warnEl.textContent = warn;
+    }
+    protoEl.addEventListener('change', function () {
+      var p = protoEl.value;
+      $('port').value = (p === 'vless' || p === 'trojan') ? '443' : (p === 'vmess' ? '443' : (p === 'ss' || p === 'outline') ? '8388' : (p === 'ssh' ? '22' : '443'));
+      showFields(); render();
+    });
+    $('btnUuid').addEventListener('click', function () { $('uuid').value = newUUID(); render(); });
+    $('btnPass').addEventListener('click', function () { $('password').value = newPass(16); render(); });
+    ['name', 'server', 'port', 'uuid', 'password', 'method', 'security', 'network', 'host', 'path', 'sni', 'scy', 'sshUser', 'proxyHost', 'proxyPort'].forEach(function (id) {
+      var el = $(id); if (el) el.addEventListener('input', render);
+    });
+    $('btnCopy').addEventListener('click', function () {
+      if (!outEl.value) return;
+      navigator.clipboard.writeText(outEl.value).then(function () { $('copyMsg').textContent = '✅ Copy ကူးပြီးပြီ — Flâsh VPN → ထည့်ရန် → Link ကူးထည့်မှာ ကပ်ပါ'; });
+    });
+    function loadKeys() {
+      try { return JSON.parse(localStorage.getItem('paramiKeys') || '[]'); } catch (e) { return []; }
+    }
+    function saveKeys(list) { localStorage.setItem('paramiKeys', JSON.stringify(list)); renderKeys(); }
+    function renderKeys() {
+      var list = loadKeys(), box = $('myKeys');
+      if (!list.length) { box.innerHTML = '<p class="muted">သိမ်းထားတဲ့ key မရှိသေးပါ။ အပေါ်က Key ထုတ်ပြီး သိမ်းမယ် နှိပ်ပါ။</p>'; $('subOut').value = ''; return; }
+      box.innerHTML = list.map(function (k, i) {
+        return '<div class="keyrow"><b>' + k.name + '</b> <span class="chip">' + k.proto + '</span> <span class="muted">' + (k.expiry || '') + '</span><br><code>' + k.link.replace(/</g, '&lt;') + '</code><br><button class="btn small" data-copy="' + i + '">📋 Copy</button> <button class="btn small danger" data-del="' + i + '">🗑 ဖျက်</button></div>';
+      }).join('');
+      box.querySelectorAll('[data-copy]').forEach(function (b) { b.addEventListener('click', function () { navigator.clipboard.writeText(list[+b.dataset.copy].link); }); });
+      box.querySelectorAll('[data-del]').forEach(function (b) { b.addEventListener('click', function () { var l = loadKeys(); l.splice(+b.dataset.del, 1); saveKeys(l); }); });
+      $('subOut').value = buildSubscription(list.map(function (k) { return k.link; }).filter(function (l) { return l.indexOf('://') > 0; }));
+    }
+    $('btnSave').addEventListener('click', function () {
+      if (!outEl.value) return;
+      var list = loadKeys();
+      list.push({ name: collect().name, proto: protoEl.value, link: outEl.value, expiry: $('expiry').value || '' });
+      saveKeys(list);
+      $('saveMsg').textContent = '✅ သိမ်းပြီးပြီ။ ဒီ browser ထဲမှာပဲ သိမ်းပါတယ်။';
+    });
+    $('btnSubCopy').addEventListener('click', function () { if ($('subOut').value) navigator.clipboard.writeText($('subOut').value); });
+    document.querySelectorAll('[data-mode]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('[data-mode]').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        document.querySelectorAll('.mode').forEach(function (m) { m.style.display = 'none'; });
+        document.getElementById('mode-' + b.dataset.mode).style.display = 'block';
+      });
+    });
+    showFields(); render(); renderKeys();
+  });
+})();
+
+</script>
+</body>
+</html>
