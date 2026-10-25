@@ -29,6 +29,22 @@ ol,ul{line-height:1.7;font-size:15px}
 Site က key ထုတ်ပေးရုံပဲ။ တကယ် ချိတ်ဖို့က <b>server တစ်လုံး</b> လိုတယ်။ Server မှာ အဲဒီ UUID/password နဲ့ ကိုက်တဲ့ config run ထားမှ key က အလုပ်လုပ်မယ်။ Server မရှိတဲ့ key က ချိတ်လို့မရဘူး။
 <br><br>ဒီ site က ဘာကိုမှ server ကို မပို့ဘူး။ Key တွေက ဒီ browser ထဲမှာပဲ သိမ်းပါတယ်။ QR ထုတ်ဖို့ အပြင် QR server ကို key ပို့တာမျိုး မလုပ်ထားဘူး။</div>
 
+<div class="card ok">
+<h2 style="margin-top:0">⚡ အမြန် VLESS ထုတ်မယ် (SSHOcean ပုံစံ)</h2>
+<p class="muted">Name နဲ့ Host/SNI ပဲ ထည့်၊ ကျန်တာ သူ့ဘာသာ ထုတ်ပေးမယ်။ UUID, WS + TLS, Path / ကို auto ထားတယ်။ Port က 443 default ဖြစ်ပြီး လိုရင် ပြောင်းလို့ရတယ်။</p>
+<label>Name (မရှိရင် Parami)</label><input id="q-name" placeholder="ဥပမာ Parami SG-1">
+<label>Host / SNI</label><input id="q-host" placeholder="ဥပမာ sg1.example.com">
+<label>Server (မရှိရင် Host ကိုပဲ သုံးမယ် — ဗလာထားလို့ရ)</label><input id="q-server" placeholder="ဗလာထားရင် Host = Server">
+<label>Port (443 မရရင် server ရဲ့ port ကို ပြောင်း — ဥပမာ 8443 / 2096 / 80)</label><input id="q-port" value="443">
+<button class="btn primary" id="btnQuick" type="button">🔑 Key ထုတ်မယ်</button>
+<button class="btn small" id="btnQuickUuid" type="button">🎲 UUID အသစ်</button>
+<label>ထွက်လာတဲ့ Key</label><textarea id="q-output" readonly placeholder="Name + Host/SNI ထည့်ပြီး Key ထုတ်မယ် နှိပ်ပါ"></textarea>
+<p id="q-warn" class="muted"></p>
+<button class="btn teal" id="btnQuickCopy" type="button">📋 Copy ကူးမယ်</button>
+<span id="q-copyMsg" class="muted"></span>
+<p class="muted">သတိ: ဒီ link က Host မှာရှိတဲ့ server က VLESS WS+TLS, Path /, အဲဒီ UUID နဲ့ run ထားမှ ချိတ်မယ်။ Host ကို ကြုံရာ domain ထည့်ရုံနဲ့ မရဘူး — SSHOcean မှာ ရတာက သူ့ server က အဲဒီ Host/SNI အတွက် ပြင်ထားပြီးသားမို့ပါ။</p>
+</div>
+
 <div class="card">
 <h2 style="margin-top:0">၁။ Key ထုတ်မယ်</h2>
 <label>Protocol</label>

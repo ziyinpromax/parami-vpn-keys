@@ -200,6 +200,31 @@
       $('saveMsg').textContent = '✅ သိမ်းပြီးပြီ။ ဒီ browser ထဲမှာပဲ သိမ်းပါတယ်။';
     });
     $('btnSubCopy').addEventListener('click', function () { if ($('subOut').value) navigator.clipboard.writeText($('subOut').value); });
+    // SSHOcean-style quick VLESS creator: Name + Host/SNI only, rest auto.
+    // Auto: fresh UUID per Create, WS + TLS, Path /, Host = SNI.
+    // Port defaults to 443 but is editable (443 does not work on every server).
+    // Server defaults to Host when the optional Server field is blank.
+    var quickUuid = '';
+    function buildQuick() {
+      var name = $('q-name').value.trim() || 'Parami';
+      var hostIn = $('q-host').value.trim();
+      var serverIn = $('q-server').value.trim();
+      var server = serverIn || hostIn;
+      var host = hostIn || server;
+      if (!server) { $('q-output').value = ''; $('q-warn').textContent = 'Host/SNI ထည့်ဦး။'; return null; }
+      if (!quickUuid) quickUuid = newUUID();
+      var port = $('q-port').value.trim() || '443';
+      var link = vlessLink({ uuid: quickUuid, server: server, port: port, security: 'tls', network: 'ws', host: host, path: '/', sni: host, name: name });
+      $('q-output').value = link;
+      $('q-warn').textContent = 'UUID, WS+TLS, Path / auto ထားတယ်။ Port က ' + port + ' ပါ။ Flâsh → ထည့်ရန် → Link ကူးထည့်မှာ ကပ်ပါ။';
+      return link;
+    }
+    $('btnQuick').addEventListener('click', function () { quickUuid = newUUID(); buildQuick(); });
+    $('btnQuickUuid').addEventListener('click', function () { quickUuid = newUUID(); if ($('q-output').value) buildQuick(); });
+    $('btnQuickCopy').addEventListener('click', function () {
+      if (!$('q-output').value) return;
+      navigator.clipboard.writeText($('q-output').value).then(function () { $('q-copyMsg').textContent = '✅ Copy ကူးပြီးပြီ — Flâsh VPN → ထည့်ရန် → Link ကူးထည့်မှာ ကပ်ပါ'; });
+    });
     document.querySelectorAll('[data-mode]').forEach(function (b) {
       b.addEventListener('click', function () {
         document.querySelectorAll('[data-mode]').forEach(function (x) { x.classList.remove('active'); });
