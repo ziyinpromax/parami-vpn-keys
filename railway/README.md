@@ -7,6 +7,28 @@ create one Railway service per protocol from the SAME repo (see below) -
 do NOT try to squeeze them all into the existing SS service, or you will
 break the working SS key.
 
+## All types on Railway - summary
+
+| Type | Railway service | How it is served |
+|---|---|---|
+| Shadowsocks (SS) | existing SS service, `MODE` unset (= `ss`) | TCP Proxy on 8388 -> public high port |
+| Outline | same SS service | same SS link + `?outline=1`, no extra service |
+| VLESS | NEW service, `MODE=vless` | HTTP domain, 443/TLS at edge, WS `/vless` inside |
+| VMess | NEW service, `MODE=vmess` | HTTP domain, 443/TLS at edge, WS `/vmess` inside |
+| Trojan | NEW service, `MODE=trojan` | HTTP domain, 443/TLS at edge, WS `/trojan` inside |
+| SSH | NEW service from `railway-ssh/` (NOT sing-box) | TCP Proxy on 2222 -> public high port |
+| WireGuard | NOT on Railway - needs UDP | see "What Railway CANNOT do" below |
+| Hysteria / Hysteria2 | NOT on Railway - needs UDP (QUIC) | see "What Railway CANNOT do" below |
+
+So Railway gives you 6 types (SS, Outline, VLESS, VMess, Trojan, SSH).
+WireGuard and Hysteria are the 2 exceptions - they are UDP protocols and
+Railway's TCP Proxy / HTTP domain cannot carry UDP, so claiming they
+work on Railway would be false. They need a UDP-capable host instead.
+For every new service below: Builder = Dockerfile, same region as the
+SS service (Singapore region for low ping from Thailand), and generate
+UUIDs/passwords on the Parami VPN Keys site itself (in your browser,
+never in chat, never in the repo) and paste them into Railway Variables.
+
 ## SS service (already working - do not change it)
 
 1. New Project -> Deploy from GitHub -> repo `parami-vpn-keys`,
@@ -57,6 +79,28 @@ Then generate the link on the site with that NEW service's HTTP domain
 
 Check the new service's Deploy logs for `Config written: MODE vless`
 (etc.) + `sing-box started` before testing in Flâsh VPN.
+
+## SSH service (separate Dockerfile, not sing-box)
+
+sing-box cannot serve SSH, so SSH has its own folder `railway-ssh/`:
+
+1. New Railway service from the same repo, Builder = Dockerfile,
+   Root Directory = `railway-ssh` (this is the one case where Root
+   Directory is NOT the repo root / `railway`).
+2. Variables (Railway dashboard, NOT in the repo):
+   - `SSH_USER` = username you choose (required)
+   - `SSH_PASSWORD` = strong password, no spaces (required)
+3. Settings -> Networking -> TCP Proxy -> add port `2222`.
+   Railway gives a public host + high port, e.g.
+   `xxxx.proxy.rlwy.net:xxxxx`. That high port is NOT 2222.
+4. In Flâsh VPN -> Add -> SSH form, fill exactly:
+   Host = TCP Proxy host, Port = TCP Proxy high port,
+   Username = `SSH_USER`, Password = `SSH_PASSWORD`,
+   Proxy / TLS / Payload = empty first (direct SSH).
+   If that works, try WS/SSL variants only if you need them.
+5. Check Deploy logs for `SSH ready: user ... on internal port 2222`
+   before testing. If the log shows `SSH_USER is not set`, the
+   Variables were not saved - set them and redeploy.
 
 `MODE=all` (SS 8388 + VLESS 8390 + VMess 8391 + Trojan 8392) is for
 local / non-Railway use only: on Railway, an HTTP domain can only point
