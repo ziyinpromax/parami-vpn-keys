@@ -89,6 +89,28 @@
   document.addEventListener('DOMContentLoaded', function () {
     var $ = function (id) { return document.getElementById(id); };
     var protoEl = $('proto'), outEl = $('output'), warnEl = $('warn');
+    // Remember Server/Port/Method in THIS browser only (localStorage).
+    // Deliberately NOT hardcoded in the public site: the site is public,
+    // so hardcoding his Railway proxy here would show it to every visitor
+    // and could burn his trial credit. This browser remembers it instead.
+    function loadSavedServer() {
+      try { return JSON.parse(localStorage.getItem('paramiServer') || 'null'); } catch (e) { return null; }
+    }
+    function saveServer() {
+      try {
+        localStorage.setItem('paramiServer', JSON.stringify({
+          server: $('server').value.trim(), port: $('port').value.trim(), method: $('method').value
+        }));
+      } catch (e) {}
+    }
+    (function restoreServer() {
+      var s = loadSavedServer();
+      if (s && s.server) {
+        $('server').value = s.server;
+        if (s.port) $('port').value = s.port;
+        if (s.method) $('method').value = s.method;
+      }
+    })();
     function showFields() {
       var p = protoEl.value;
       ['f-vless', 'f-vmess', 'f-trojan', 'f-ss', 'f-ssh'].forEach(function (id) {
@@ -136,13 +158,21 @@
     }
     protoEl.addEventListener('change', function () {
       var p = protoEl.value;
-      $('port').value = (p === 'vless' || p === 'trojan') ? '443' : (p === 'vmess' ? '443' : (p === 'ss' || p === 'outline') ? '8388' : (p === 'ssh' ? '22' : '443'));
-      showFields(); render();
+      var saved = loadSavedServer();
+      // Do not overwrite a remembered port: e.g. his Railway SS port is
+      // 21212, not the generic 8388, so a remembered port wins for ss/outline.
+      if ((p === 'ss' || p === 'outline') && saved && saved.port) { $('port').value = saved.port; }
+      else { $('port').value = (p === 'vless' || p === 'trojan') ? '443' : (p === 'vmess' ? '443' : (p === 'ss' || p === 'outline') ? '8388' : (p === 'ssh' ? '22' : '443')); }
+      showFields(); render(); saveServer();
     });
     $('btnUuid').addEventListener('click', function () { $('uuid').value = newUUID(); render(); });
     $('btnPass').addEventListener('click', function () { $('password').value = newPass(16); render(); });
     ['name', 'server', 'port', 'uuid', 'password', 'method', 'security', 'network', 'host', 'path', 'sni', 'scy', 'sshUser', 'proxyHost', 'proxyPort'].forEach(function (id) {
       var el = $(id); if (el) el.addEventListener('input', render);
+    });
+    ['server', 'port', 'method'].forEach(function (id) {
+      var el = $(id); if (el) el.addEventListener('input', saveServer);
+      if (el) el.addEventListener('change', saveServer);
     });
     $('btnCopy').addEventListener('click', function () {
       if (!outEl.value) return;
